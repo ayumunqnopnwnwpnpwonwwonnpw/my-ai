@@ -12,15 +12,20 @@ export default async function handler(req, res) {
         },
         body: JSON.stringify({
           inputs: message,
+          options: { wait_for_model: true }
         }),
       }
     );
 
     const data = await response.json();
 
+    if (data.error) {
+      return res.status(200).json({ reply: "モデル読み込み中…少し待ってもう一回！" });
+    }
+
     const reply =
       data?.[0]?.generated_text ||
-      "モデル読み込み中かも…少し待ってね";
+      "今ちょっと不安定かも…";
 
     return res.status(200).json({ reply });
 

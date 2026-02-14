@@ -1,53 +1,114 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>My Cute AI</title>
+
 <style>
 body {
   font-family: sans-serif;
-  background: #ffeef8;
-  text-align: center;
+  background: linear-gradient(135deg, #ffd6ec, #c8f1ff);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
 }
-#chat {
-  width: 90%;
-  max-width: 500px;
-  margin: auto;
+
+.container {
+  width: 95%;
+  max-width: 400px;
   background: white;
   border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
   padding: 20px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
 }
+
+h2 {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+#messages {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 10px;
+}
+
 .message {
-  margin: 10px;
   padding: 10px;
+  margin: 5px 0;
   border-radius: 15px;
+  max-width: 80%;
 }
-.user { background: #d0f0ff; }
-.ai { background: #ffd6ec; }
-button {
-  background: #ff8ac2;
-  border: none;
-  padding: 8px 15px;
+
+.user {
+  background: #c8f1ff;
+  align-self: flex-end;
+}
+
+.ai {
+  background: #ffd6ec;
+  align-self: flex-start;
+}
+
+input {
+  padding: 10px;
   border-radius: 10px;
+  border: 1px solid #ccc;
+  width: 100%;
+  margin-bottom: 5px;
+}
+
+button {
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  background: #ff8ecf;
   color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.8;
+}
+
+#chat {
+  display: none;
+  flex-direction: column;
+  height: 400px;
+}
+
+#limit {
+  text-align: center;
+  color: red;
+  font-size: 14px;
 }
 </style>
 </head>
+
 <body>
 
-<h1>💖 My Cute AI 💖</h1>
+<div class="container">
 
 <div id="login">
-  <input id="username" placeholder="ニックネーム" />
-  <button onclick="start()">はじめる</button>
+  <h2>名前を入力してね 💖</h2>
+  <input type="text" id="username" placeholder="あなたの名前">
+  <button onclick="start()">スタート</button>
 </div>
 
-<div id="chat" style="display:none;">
+<div id="chat">
+  <h2>My Cute AI 💬</h2>
   <div id="messages"></div>
-  <input id="msg" placeholder="メッセージを入力" />
+  <div id="limit"></div>
+  <input type="text" id="msg" placeholder="メッセージを入力">
   <button onclick="send()">送信</button>
-  <p id="limit"></p>
+</div>
+
 </div>
 
 <script>
@@ -59,7 +120,7 @@ function start() {
   user = document.getElementById("username").value;
   if (!user) return alert("名前入れてね");
   document.getElementById("login").style.display = "none";
-  document.getElementById("chat").style.display = "block";
+  document.getElementById("chat").style.display = "flex";
 }
 
 function addMessage(text, type) {
@@ -67,6 +128,7 @@ function addMessage(text, type) {
   div.className = "message " + type;
   div.innerText = text;
   document.getElementById("messages").appendChild(div);
+  div.scrollIntoView();
 }
 
 async function send() {
@@ -76,6 +138,8 @@ async function send() {
   }
 
   const message = document.getElementById("msg").value;
+  if (!message) return;
+
   addMessage(message, "user");
 
   const res = await fetch("/api/chat", {
@@ -85,7 +149,11 @@ async function send() {
   });
 
   const data = await res.json();
-  addMessage(data.reply, "ai");
+
+  const reply = data.choices?.[0]?.message?.content 
+    || "エラーが発生したよ";
+
+  addMessage(reply, "ai");
 
   count++;
   document.getElementById("msg").value = "";

@@ -1,31 +1,27 @@
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
-
-  const { message } = req.body;
-
   try {
+    const { message } = req.body;
+
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
+        "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        "HTTP-Referer": "https://your-site.vercel.app",
+        "X-Title": "My AI"
       },
       body: JSON.stringify({
         model: "mistralai/mistral-7b-instruct:free",
         messages: [
           { role: "user", content: message }
-        ],
-      }),
+        ]
+      })
     });
 
-    const data = await response.json();
+    const text = await response.text();
+    return res.status(200).send(text);
 
-    // ★ エラーもそのまま返す
-    return res.status(200).json(data);
-
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
+  } catch (err) {
+    return res.status(500).json({ error: String(err) });
   }
 }

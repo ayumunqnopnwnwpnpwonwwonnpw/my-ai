@@ -7,7 +7,7 @@ export default async function handler(req, res) {
       {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${process.env.HF_API_KEY}`,
+          Authorization: `Bearer ${process.env.HF_API_KEY}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -20,7 +20,7 @@ export default async function handler(req, res) {
 
     const reply =
       data?.[0]?.generated_text ||
-      "今ちょっと混んでるかも…";
+      "モデル読み込み中かも…少し待ってね";
 
     return res.status(200).json({ reply });
 

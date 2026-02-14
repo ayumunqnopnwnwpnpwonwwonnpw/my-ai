@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Cute AI</title>
+<title>My Free AI</title>
 
 <style>
 body {
@@ -29,7 +29,6 @@ body {
 
 h2 {
   text-align: center;
-  margin-bottom: 10px;
 }
 
 #messages {
@@ -73,21 +72,8 @@ button {
   cursor: pointer;
 }
 
-button:hover {
-  opacity: 0.8;
-}
-
-#chat {
-  display: none;
-  flex-direction: column;
-  height: 400px;
-}
-
-#limit {
-  text-align: center;
-  color: red;
-  font-size: 14px;
-}
+#chat { display: none; flex-direction: column; height: 400px; }
+#limit { text-align: center; color: red; font-size: 14px; }
 </style>
 </head>
 
@@ -102,7 +88,7 @@ button:hover {
 </div>
 
 <div id="chat">
-  <h2>My Cute AI 💬</h2>
+  <h2>Free AI 💬</h2>
   <div id="messages"></div>
   <div id="limit"></div>
   <input type="text" id="msg" placeholder="メッセージを入力">
@@ -149,11 +135,7 @@ async function send() {
   });
 
   const data = await res.json();
-
-  const reply = data.choices?.[0]?.message?.content 
-    || "エラーが発生したよ";
-
-  addMessage(reply, "ai");
+  addMessage(data.reply || "今ちょっと混んでるかも…", "ai");
 
   count++;
   document.getElementById("msg").value = "";

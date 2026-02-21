@@ -1,144 +1,33 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Free AI</title>
-
-<style>
-body {
-  font-family: sans-serif;
-  background: linear-gradient(135deg, #ffd6ec, #c8f1ff);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  margin: 0;
-}
-
-.container {
-  width: 95%;
-  max-width: 400px;
-  background: white;
-  border-radius: 20px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-}
-
-h2 {
-  text-align: center;
-}
-
-#messages {
-  flex: 1;
-  overflow-y: auto;
-  margin-bottom: 10px;
-}
-
-.message {
-  padding: 10px;
-  margin: 5px 0;
-  border-radius: 15px;
-  max-width: 80%;
-}
-
-.user {
-  background: #c8f1ff;
-  align-self: flex-end;
-}
-
-.ai {
-  background: #ffd6ec;
-  align-self: flex-start;
-}
-
-input {
-  padding: 10px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-  width: 100%;
-  margin-bottom: 5px;
-}
-
-button {
-  padding: 10px;
-  border: none;
-  border-radius: 10px;
-  background: #ff8ecf;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-#chat { display: none; flex-direction: column; height: 400px; }
-#limit { text-align: center; color: red; font-size: 14px; }
-</style>
+<title>My AI</title>
 </head>
-
 <body>
 
-<div class="container">
-
-<div id="login">
-  <h2>名前を入力してね 💖</h2>
-  <input type="text" id="username" placeholder="あなたの名前">
-  <button onclick="start()">スタート</button>
-</div>
-
-<div id="chat">
-  <h2>Free AI 💬</h2>
-  <div id="messages"></div>
-  <div id="limit"></div>
-  <input type="text" id="msg" placeholder="メッセージを入力">
-  <button onclick="send()">送信</button>
-</div>
-
-</div>
+<h2>無料AIチャット</h2>
+<input id="msg" placeholder="メッセージ">
+<button onclick="send()">送信</button>
+<pre id="chat"></pre>
 
 <script>
-let user = "";
-let count = 0;
-const LIMIT = 20;
-
-function start() {
-  user = document.getElementById("username").value;
-  if (!user) return alert("名前入れてね");
-  document.getElementById("login").style.display = "none";
-  document.getElementById("chat").style.display = "flex";
-}
-
-function addMessage(text, type) {
-  const div = document.createElement("div");
-  div.className = "message " + type;
-  div.innerText = text;
-  document.getElementById("messages").appendChild(div);
-  div.scrollIntoView();
-}
-
 async function send() {
-  if (count >= LIMIT) {
-    document.getElementById("limit").innerText = "今日はもうお話できないよ…";
-    return;
-  }
-
   const message = document.getElementById("msg").value;
   if (!message) return;
-
-  addMessage(message, "user");
 
   const res = await fetch("/api/chat", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message, user })
+    body: JSON.stringify({ message })
   });
 
   const data = await res.json();
-  addMessage(data.reply || "今ちょっと混んでるかも…", "ai");
+  const reply = data.reply || "エラー";
 
-  count++;
-  document.getElementById("msg").value = "";
+  document.getElementById("chat").innerText +=
+    "\nあなた: " + message +
+    "\nAI: " + reply + "\n";
 }
 </script>
 
